@@ -1,0 +1,68 @@
+# create parameters
+parameters:
+  folder: ''                                            # what folder to version assemblies to
+  solution: '*.sln'                                     # solution to build
+  buildPlatform: 'Any CPU'                              # build platform to build on
+  buildConfiguration: 'Release'                         # configuration for build
+  buildArgs: ''                                         # build arguments
+  restoreDirectory: ''                                  # where to restore NuGet to
+  test: true                                            # whether or not to test
+  codeCoverage: true                             # whether or not to enable code coverage
+  pack: false                                           # whether or not to create an NuGet package
+  filesToPack: '**/*.*proj'                             # files to pack
+  packageFolder: $(Build.ArtifactStagingDirectory)      # folder in which to place the package
+
+steps:
+# use specific version of NuGet
+- task: NuGetToolInstaller@0
+  displayName: 'Use NuGet 4.x'
+  inputs:
+    versionSpec: 4.x
+
+# NuGet restore
+- task: NuGetCommand@2
+  displayName: 'NuGet Restore'
+  inputs:
+    restoreSolution: ${{ parameters.solution }}
+    restoreDirectory: ${{ parameters.restoreDirectory }}
+
+# version assemblies
+- task: colinsalmcorner.colinsalmcorner-buildtasks.version-assemblies-task.VersionAssemblies@2
+  displayName: 'Version Assemblies'
+  inputs:
+    sourcePath: '${{ parameters.folder }}'
+
+# build solution
+- task: VSBuild@1
+  displayName: 'Build Solution'
+  inputs:
+    solution: ${{ parameters.solution }}
+    msbuildArgs: ${{ parameters.buildArgs }}
+    platform: ${{ parameters.buildPlatform }}
+    configuration:  ${{ parameters.buildConfiguration }}
+
+# test solution
+- ${{ if eq(parameters.test, 'true') }}:
+  # install tester
+  - task: VisualStudioTestPlatformInstaller@1
+    displayName: 'Visual Studio Test Platform Installer'
+    inputs:
+      versionSelector: latestStable
+
+  # test solution
+  - task: VSTest@2
+    displayName: 'Test Assemblies'
+    inputs:
+      platform: ${{ parameters.buildPlatform }}
+      configuration:  ${{ parameters.buildConfiguration }}
+      codeCoverageEnabled: ${{ parameters.codeCoverage }}
+
+# create NuGet package
+- ${{ if eq(parameters.pack, 'true') }}:
+  - task: NuGetCommand@2
+    displayName: 'Create NuGet Package'
+    inputs:
+      command: pack
+      packagesToPack: ${{ parameters.filesToPack }}
+      packDestination: ${{ parameters.packageFolder }}
+      versioningScheme: byBuildNumber

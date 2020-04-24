@@ -1,0 +1,40 @@
+parameters:
+  projects: '**/*.csproj'                             # projects to build
+  buildArguments: '-p:Configuration=Release'          # build arguments
+  test: true                                          # whether or not to test projects
+  testProjects: '**/*Tests.csproj'                    # projects to test
+  folder: ''                                          # working directory folder used to package the lambda
+  pack: false                                         # whether or not to create an NuGet package
+
+# restore NuGet
+steps:
+- task: DotNetCoreCLI@2
+  displayName: 'NuGet Restore'
+  inputs:
+    command: restore
+    projects: '${{ parameters.projects }}'
+
+# build dot net core project(s)
+- task: DotNetCoreCLI@2
+  displayName: 'Build DotNet Core'
+  inputs:
+    projects: '${{ parameters.projects }}'
+    arguments: '${{ parameters.buildArguments }}'
+
+# test dot net core project(s)
+- ${{ if eq(parameters.test, 'true') }}:
+  - task: DotNetCoreCLI@2
+    displayName: 'Test DotNet Core'
+    inputs:
+        command: test
+        projects: '${{ parameters.testProjects }}'
+        arguments: '${{ parameters.buildArguments }}'
+
+# create NuGet package
+- ${{ if eq(parameters.pack, 'true') }}:
+  - task: DotNetCoreCLI@2
+    displayName: 'Create NuGet Package'
+    inputs:
+      command: pack
+      packagesToPack: '$(Project)'
+      versioningScheme: byBuildNumber
