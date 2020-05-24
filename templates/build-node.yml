@@ -20,6 +20,12 @@ stages:
       vmImage: ubuntu-latest
 
     steps:
+    # setup git
+    - script: |
+        git config --global user.email "default@dummy.com"
+        git config --global user.name "kbrashears5"
+      displayName: 'Initialize Git'
+
     # install npm dependencies
     - task: Npm@1
       displayName: 'Install Dependencies: ${{ parameters.folder }}'
