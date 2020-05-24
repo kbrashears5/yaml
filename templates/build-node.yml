@@ -6,71 +6,84 @@ parameters:
   pack: false                                         # whether or not to create an NPM package
   version: $(Build.BuildNumber)                       # version number
 
-steps:
-# install npm dependencies
-- task: Npm@1
-  displayName: 'Install Dependencies: ${{ parameters.folder }}'
-  inputs:
-    workingDir: '${{ parameters.folder }}'
-    command: custom
-    customCommand: 'install --silent --prefer-offline --no-audit'
+stages:
+- stage: 'Build'
+  variables:
+    SolutionName: '${{ parameters.SolutionName }}'
+    BuildPlatform: 'Any CPU'
+    BuildConfiguration: 'Release'
 
-# update version in package.json
-- task: Npm@1
-  displayName: 'Update Version: ${{ parameters.folder }}'
-  inputs:
-    workingDir: '${{ parameters.folder }}'
-    command: custom
-    customCommand: 'version ${{ parameters.version }} --force'
+  jobs:
+  - job: Build
+    # defines agent pool and demands (https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-devops&tabs=example#pool)
+    pool:
+      vmImage: ubuntu-latest
 
-# build
-- task: Npm@1
-  displayName: 'Run Build: ${{ parameters.folder }}'
-  inputs:
-    workingDir: '${{ parameters.folder }}'
-    command: custom
-    customCommand: 'run build'
-
-# test
-- ${{ if eq(parameters.test, 'true') }}:
-  - task: Npm@1
-    displayName: 'Run Test: ${{ parameters.folder }}'
-    inputs:
-      workingDir: '${{ parameters.folder }}'
-      command: custom
-      customCommand: 'run test'
-
-  # publish test results
-  - task: PublishTestResults@2
-    displayName: 'Publish Test Results: ${{ parameters.folder }}'
-    condition: succeededOrFailed()
-    inputs:
-      testResultsFiles: '**/junit.xml'
-      failTaskOnFailedTests: true
-      
-  # code coverage
-  - ${{ if eq(parameters.codeCoverage, 'true') }}:
-    - task: PublishCodeCoverageResults@1
-      displayName: 'Publish code coverage'
+    steps:
+    # install npm dependencies
+    - task: Npm@1
+      displayName: 'Install Dependencies: ${{ parameters.folder }}'
       inputs:
-        codeCoverageTool: Cobertura
-        summaryFileLocation: '**/cobertura-coverage.xml'
+        workingDir: '${{ parameters.folder }}'
+        command: custom
+        customCommand: 'install --silent --prefer-offline --no-audit'
 
-# npm package
-- ${{ if eq(parameters.pack, 'true') }}:
-  # delete any previous NPM packages
-  - task: DeleteFiles@1
-    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-    displayName: 'Delete Previous Package:  ${{ parameters.folder }}'
-    inputs:
-      SourceFolder: '${{ parameters.folder }}'
-      Contents: '*.tgz'
+    # update version in package.json
+    - task: Npm@1
+      displayName: 'Update Version: ${{ parameters.folder }}'
+      inputs:
+        workingDir: '${{ parameters.folder }}'
+        command: custom
+        customCommand: 'version ${{ parameters.version }} --force'
 
-  # create a new package
-  - task: Npm@1
-    displayName: 'Create Package: ${{ parameters.folder }}'
-    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-    inputs:
-      workingDir: ${{ parameters.folder }}
-      command: custom
-      customCommand: 'pack'
+    # build
+    - task: Npm@1
+      displayName: 'Run Build: ${{ parameters.folder }}'
+      inputs:
+        workingDir: '${{ parameters.folder }}'
+        command: custom
+        customCommand: 'run build'
+
+    # test
+    - ${{ if eq(parameters.test, 'true') }}:
+      - task: Npm@1
+        displayName: 'Run Test: ${{ parameters.folder }}'
+        inputs:
+          workingDir: '${{ parameters.folder }}'
+          command: custom
+          customCommand: 'run test'
+
+      # publish test results
+      - task: PublishTestResults@2
+        displayName: 'Publish Test Results: ${{ parameters.folder }}'
+        condition: succeededOrFailed()
+        inputs:
+          testResultsFiles: '**/junit.xml'
+          failTaskOnFailedTests: true
+          
+      # code coverage
+      - ${{ if eq(parameters.codeCoverage, 'true') }}:
+        - task: PublishCodeCoverageResults@1
+          displayName: 'Publish code coverage'
+          inputs:
+            codeCoverageTool: Cobertura
+            summaryFileLocation: '**/cobertura-coverage.xml'
+
+    # npm package
+    - ${{ if eq(parameters.pack, 'true') }}:
+      # delete any previous NPM packages
+      - task: DeleteFiles@1
+        condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+        displayName: 'Delete Previous Package:  ${{ parameters.folder }}'
+        inputs:
+          SourceFolder: '${{ parameters.folder }}'
+          Contents: '*.tgz'
+
+      # create a new package
+      - task: Npm@1
+        displayName: 'Create Package: ${{ parameters.folder }}'
+        condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+        inputs:
+          workingDir: ${{ parameters.folder }}
+          command: custom
+          customCommand: 'pack'
