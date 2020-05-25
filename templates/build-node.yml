@@ -90,7 +90,7 @@ stages:
         displayName: 'Create Package'
         condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
         inputs:
-          workingDir: ${{ parameters.folder }}
+          workingDir: '${{ parameters.folder }}'
           command: custom
           customCommand: 'pack'
 
@@ -100,6 +100,6 @@ stages:
         condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
         inputs:
           command: publish
-          workingDir: '$(System.DefaultWorkingDirectory)/$(ArtifactsName)/artifacts'
+          workingDir: '${{ parameters.folder }}'
           verbose: false
           publishEndpoint: 'NPM Registry'
