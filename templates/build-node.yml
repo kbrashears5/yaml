@@ -28,7 +28,7 @@ stages:
 
     # install npm dependencies
     - task: Npm@1
-      displayName: 'Install Dependencies: ${{ parameters.folder }}'
+      displayName: 'Install Dependencies'
       inputs:
         workingDir: '${{ parameters.folder }}'
         command: custom
@@ -36,7 +36,7 @@ stages:
 
     # update version in package.json
     - task: Npm@1
-      displayName: 'Update Version: ${{ parameters.folder }}'
+      displayName: 'Update Version'
       inputs:
         workingDir: '${{ parameters.folder }}'
         command: custom
@@ -44,7 +44,7 @@ stages:
 
     # build
     - task: Npm@1
-      displayName: 'Run Build: ${{ parameters.folder }}'
+      displayName: 'Build'
       inputs:
         workingDir: '${{ parameters.folder }}'
         command: custom
@@ -53,7 +53,7 @@ stages:
     # test
     - ${{ if eq(parameters.test, 'true') }}:
       - task: Npm@1
-        displayName: 'Run Test: ${{ parameters.folder }}'
+        displayName: 'Test'
         inputs:
           workingDir: '${{ parameters.folder }}'
           command: custom
@@ -61,7 +61,7 @@ stages:
 
       # publish test results
       - task: PublishTestResults@2
-        displayName: 'Publish Test Results: ${{ parameters.folder }}'
+        displayName: 'Publish Test Results'
         condition: succeededOrFailed()
         inputs:
           testResultsFiles: '**/junit.xml'
@@ -70,7 +70,7 @@ stages:
       # code coverage
       - ${{ if eq(parameters.codeCoverage, 'true') }}:
         - task: PublishCodeCoverageResults@1
-          displayName: 'Publish code coverage'
+          displayName: 'Publish Code Coverage'
           inputs:
             codeCoverageTool: Cobertura
             summaryFileLocation: '**/cobertura-coverage.xml'
@@ -80,16 +80,26 @@ stages:
       # delete any previous NPM packages
       - task: DeleteFiles@1
         condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-        displayName: 'Delete Previous Package:  ${{ parameters.folder }}'
+        displayName: 'Delete Previous Packages'
         inputs:
           SourceFolder: '${{ parameters.folder }}'
           Contents: '*.tgz'
 
       # create a new package
       - task: Npm@1
-        displayName: 'Create Package: ${{ parameters.folder }}'
+        displayName: 'Create Package'
         condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
         inputs:
           workingDir: ${{ parameters.folder }}
           command: custom
           customCommand: 'pack'
+
+      # publish package
+      - task: Npm@1
+        displayName: 'Publish Package'
+        condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+        inputs:
+          command: publish
+          workingDir: '$(System.DefaultWorkingDirectory)/$(ArtifactsName)/artifacts'
+          verbose: false
+          publishEndpoint: 'NPM Registry'
