@@ -23,4 +23,12 @@ stages:
 - template: templates/build-dotnet-core.yml@templates
   parameters:
     pack: true
-    filesToPack: '**/*.csproj'
+      projects: '**/*.csproj'
+      buildArguments: '-p:Configuration=Release'
+      test: true
+      testProjects: '**/*Tests.csproj'
+      folder: ''
+      pack: false
+      filesToPack: '**/*.*proj'
+      packageFolder: '$(Build.ArtifactStagingDirectory)'
+      nuGetCredentials: 'NuGet'
