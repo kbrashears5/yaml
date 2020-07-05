@@ -11,8 +11,6 @@ parameters:
 
 stages:
 - stage: 'Build'
-  variables:
-
   jobs:
   - job: Build
     # defines agent pool and demands (https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-devops&tabs=example#pool)
