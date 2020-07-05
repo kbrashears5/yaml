@@ -18,9 +18,9 @@ trigger:
     include:
     - src/*
 
-# build solution and create nuget package
+# build projects and create nuget package
 stages:
-- template: templates/build-node.yml@templates
+- template: templates/build-dotnet-core.yml@templates
   parameters:
     pack: true
     filesToPack: '**/*.csproj'

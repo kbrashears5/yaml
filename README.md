@@ -1,13 +1,15 @@
 # kbrashears5/yaml
-Created by Kevin Brashears
+Yaml stage templates and examples for Azure Pipelines
 
 ## Examples
 Examples include:
-- Azure DevOps Pipeline yml file
-- Template for a .NET pipeline
+- Azure DevOps Pipeline yml file for each of the following
+    - .NET
+    - .NET Core
+    - NodeJS
 
 ## Templates
-Templates include:
+Stage templates include:
 - Build .NET solution
-- Build .NET Core solution
+- Build .NET Core projects
 - Build NodeJs

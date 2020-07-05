@@ -5,36 +5,73 @@ parameters:
   testProjects: '**/*Tests.csproj'                    # projects to test
   folder: ''                                          # working directory folder used to package the lambda
   pack: false                                         # whether or not to create an NuGet package
+  filesToPack: '**/*.*proj'                           # files to pack
+  packageFolder: '$(Build.ArtifactStagingDirectory)'  # folder in which to place the package
+  nuGetCredentials: 'NuGet'                           # name of NuGet service connection
 
-# restore NuGet
-steps:
-- task: DotNetCoreCLI@2
-  displayName: 'NuGet Restore'
-  inputs:
-    command: restore
-    projects: '${{ parameters.projects }}'
+stages:
+- stage: 'Build'
+  variables:
 
-# build dot net core project(s)
-- task: DotNetCoreCLI@2
-  displayName: 'Build DotNet Core'
-  inputs:
-    projects: '${{ parameters.projects }}'
-    arguments: '${{ parameters.buildArguments }}'
+  jobs:
+  - job: Build
+    # defines agent pool and demands (https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-devops&tabs=example#pool)
+    pool:
+      vmImage: windows-latest
 
-# test dot net core project(s)
-- ${{ if eq(parameters.test, 'true') }}:
-  - task: DotNetCoreCLI@2
-    displayName: 'Test DotNet Core'
-    inputs:
-        command: test
-        projects: '${{ parameters.testProjects }}'
+    steps:
+    # get sources (https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-devops&tabs=example#checkout)
+    - checkout: self
+      clean: true
+
+    # use specific version of NuGet
+    - task: NuGetToolInstaller@0
+      displayName: 'Use NuGet 4.x'
+      inputs:
+        versionSpec: 4.x
+
+    # NuGet restore
+    - task: DotNetCoreCLI@2
+      displayName: 'NuGet Restore'
+      inputs:
+        command: restore
+        projects: '${{ parameters.projects }}'
+
+    # build dot net core project(s)
+    - task: DotNetCoreCLI@2
+      displayName: 'Build DotNet Core'
+      inputs:
+        projects: '${{ parameters.projects }}'
         arguments: '${{ parameters.buildArguments }}'
 
-# create NuGet package
-- ${{ if eq(parameters.pack, 'true') }}:
-  - task: DotNetCoreCLI@2
-    displayName: 'Create NuGet Package'
-    inputs:
-      command: pack
-      packagesToPack: '$(Project)'
-      versioningScheme: byBuildNumber
+    # test projects
+    - ${{ if eq(parameters.test, 'true') }}:
+      # test dot net core project(s)
+      - task: DotNetCoreCLI@2
+        displayName: 'Test DotNet Core'
+        inputs:
+            command: test
+            projects: '${{ parameters.testProjects }}'
+            arguments: '${{ parameters.buildArguments }}'
+
+    # create NuGet package
+    - ${{ if eq(parameters.pack, 'true') }}:
+      - task: NuGetCommand@2
+        condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+        displayName: 'Create NuGet Package'
+        inputs:
+          command: pack
+          packagesToPack: '${{ parameters.filesToPack }}'
+          packDestination: '${{ parameters.packageFolder }}'
+          versioningScheme: byBuildNumber
+    
+      # publish NuGet Package
+      - task: NuGetCommand@2
+        condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+        displayName: 'Publish NuGet Package'
+        inputs:
+          command: push
+          feedsToUse: config
+          externalFeedCredentials: '${{ parameters.nuGetCredentials }}'
+          nuGetFeedType: external
+          publishFeedCredentials: '${{ parameters.nuGetCredentials }}'
