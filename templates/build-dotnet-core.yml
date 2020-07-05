@@ -64,7 +64,7 @@ stages:
           versioningScheme: byBuildNumber
     
       # publish NuGet Package
-      - task: DotNetCoreCLI@2
+      - task: NuGetCommand@2
         condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
         displayName: 'Publish NuGet Package'
         inputs:
