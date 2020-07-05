@@ -54,7 +54,7 @@ stages:
 
     # create NuGet package
     - ${{ if eq(parameters.pack, 'true') }}:
-      - task: NuGetCommand@2
+      - task: DotNetCoreCLI@2
         condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
         displayName: 'Create NuGet Package'
         inputs:
@@ -64,7 +64,7 @@ stages:
           versioningScheme: byBuildNumber
     
       # publish NuGet Package
-      - task: NuGetCommand@2
+      - task: DotNetCoreCLI@2
         condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
         displayName: 'Publish NuGet Package'
         inputs:
