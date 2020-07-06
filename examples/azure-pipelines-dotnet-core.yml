@@ -39,6 +39,7 @@ stages:
       testProjects: '**/*Tests.csproj'
       folder: ''
       pack: false
+      codeCoverage: true
       filesToPack: '**/*.*proj'
       packageFolder: '$(Build.ArtifactStagingDirectory)'
       nuGetCredentials: 'NuGet'

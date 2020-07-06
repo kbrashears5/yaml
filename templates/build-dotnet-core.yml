@@ -5,12 +5,19 @@ parameters:
   testProjects: '**/*Tests.csproj'                    # projects to test
   folder: ''                                          # working directory folder used to package the lambda
   pack: false                                         # whether or not to create an NuGet package
+  codeCoverage: true                                  # whether or not to create an NuGet package
   filesToPack: '**/*.*proj'                           # files to pack
   packageFolder: '$(Build.ArtifactStagingDirectory)'  # folder in which to place the package
   nuGetCredentials: 'NuGet'                           # name of NuGet service connection
 
 stages:
 - stage: 'Build'
+  variables:
+    ${{ if eq(parameters.codeCoverage, 'true') }}:
+      TestArguments: '${{ parameters.buildArguments }} /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
+    ${{ if eq(parameters.codeCoverage, 'false') }}:
+      TestArguments: '${{ parameters.buildArguments }}'
+
   jobs:
   - job: Build
     # defines agent pool and demands (https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-devops&tabs=example#pool)
@@ -50,7 +57,8 @@ stages:
         inputs:
             command: test
             projects: '${{ parameters.testProjects }}'
-            arguments: '${{ parameters.buildArguments }}'
+            arguments: $(TestArguments)
+            noBuild: true
 
     # create NuGet package
     - ${{ if eq(parameters.pack, 'true') }}:
