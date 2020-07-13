@@ -1,0 +1,9 @@
+# https://docs.github.com/en/github/administering-a-repository/about-github-dependabot
+version: 2
+updates:
+  # package.json in root directory
+  - package-ecosystem: "npm"
+    directory: "/"
+    # daily at 5am UTC
+    schedule:
+      interval: "daily"
