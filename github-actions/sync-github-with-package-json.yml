@@ -1,0 +1,25 @@
+name: sync-github-with-package-json
+
+# trigger on pushes to master
+on:
+ push:
+  branches: [master]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+    - name: actions/checkout
+      uses: actions/checkout@v2.0.0
+    - name: actions/setup-node
+      uses: actions/setup-node@v1.4.1
+      with:
+        node-version: "13.9.0"
+    # https://github.com/Jaid/action-sync-node-meta
+    - name: Jaid/action-sync-node-meta
+      uses: jaid/action-sync-node-meta@v1.4.0
+      with:
+        direction: overwrite-github
+        # setup personal access token (https://github.com/settings/tokens) - needs repo scope
+        githubToken: ${{ secrets.ACTIONS }}
+        syncHomepage: false
