@@ -1,3 +1,5 @@
+# must go in the .github/workflows folder
+
 name: sync-github-with-package-json
 
 # trigger on pushes to master
