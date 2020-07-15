@@ -4,8 +4,14 @@
 version: 2
 updates:
   # package.json in root directory
+  # https://docs.github.com/en/github/administering-a-repository/configuration-options-for-dependency-updates#package-ecosystem
   - package-ecosystem: "npm"
+    # https://docs.github.com/en/github/administering-a-repository/configuration-options-for-dependency-updates#directory
     directory: "/"
     # daily at 5am UTC
+    # https://docs.github.com/en/github/administering-a-repository/configuration-options-for-dependency-updates#scheduleinterval
     schedule:
       interval: "daily"
+    # always get latest version
+    # https://docs.github.com/en/github/administering-a-repository/configuration-options-for-dependency-updates#versioning-strategy
+    versioning-strategy: increase
