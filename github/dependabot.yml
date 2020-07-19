@@ -15,3 +15,7 @@ updates:
     # always get latest version
     # https://docs.github.com/en/github/administering-a-repository/configuration-options-for-dependency-updates#versioning-strategy
     versioning-strategy: increase
+    # set reviewers
+    # https://docs.github.com/en/github/administering-a-repository/configuration-options-for-dependency-updates#reviewers
+    reviewers:
+      - "kbrashears5"
