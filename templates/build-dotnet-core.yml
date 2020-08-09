@@ -86,7 +86,7 @@ stages:
           packagesToPack: '${{ parameters.filesToPack }}'
           packDestination: '${{ parameters.packageFolder }}'
           versioningScheme: byBuildNumber
-          noBuild: true
+          # noBuild: true
     
       # publish NuGet Package
       - task: NuGetCommand@2
