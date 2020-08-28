@@ -1,0 +1,13 @@
+{
+    "description": "YAML templates for Azure Pipelines and supporting examples",
+    "homepage": "https://github.com/kbrashears5/yaml",
+    "keywords": [
+        "yaml",
+        "template",
+        "example",
+        "build",
+        "release",
+        "CI",
+        "CD"
+    ]
+}
