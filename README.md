@@ -7,9 +7,11 @@ Examples include:
     - .NET
     - .NET Core
     - NodeJS
+    - Shell
 
 ## Templates
 Stage templates include:
 - Build .NET solution
 - Build .NET Core projects
 - Build NodeJs
+- Build Shell script

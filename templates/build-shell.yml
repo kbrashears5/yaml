@@ -1,0 +1,15 @@
+# create parameters
+parameters:
+  scriptPath: ''  # path to shell script
+
+stages:
+- stage: 'Build'
+  jobs:
+  - job: Build
+    # defines agent pool and demands (https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-devops&tabs=example#pool)
+    pool:
+      vmImage: ubuntu-latest
+
+    steps:  
+    # check for syntax errors
+    - bash: bash -n -v $(scriptPath)
