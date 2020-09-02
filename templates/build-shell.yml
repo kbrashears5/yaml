@@ -12,4 +12,4 @@ stages:
 
     steps:  
     # check for syntax errors
-    - bash: bash -n -v $(scriptPath)
+    - bash: bash -n -v '${{ parameters.scriptPath }}'

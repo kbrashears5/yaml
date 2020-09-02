@@ -20,4 +20,4 @@ pr:
 stages:
 - template: templates/build-shell.yml@templates
   parameters:
-    scriptPath: '/filePath/fileName.sh'
+    scriptPath: 'entrypoint.sh'
