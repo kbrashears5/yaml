@@ -13,3 +13,4 @@ stages:
     steps:  
     # check for syntax errors
     - bash: bash -n -v '${{ parameters.scriptPath }}'
+      displayName: 'Build Shell Script'
