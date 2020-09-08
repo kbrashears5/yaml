@@ -11,8 +11,6 @@ steps:
 
 # github release
 - bash: |
-    echo "$GITHUB_TOKEN"
-    
     BASE_URL="${{ parameters.githubApiUrl }}"
     echo "Base URL: [$BASE_URL]"
     BUILD_NUMBER="$(Build.BuildNumber)"
@@ -24,6 +22,8 @@ steps:
     REPO_INFO=($(echo $REPO_NAME | tr "/" "\n"))
     USERNAME=${REPO_INFO[0]}
     echo "Username: [$USERNAME]"
+
+    echo " "
 
     jq -n --arg eventType "release" --arg version "$BUILD_NUMBER" '{event_type:$eventType,client_payload:{version:$version}}'
     jq -n \
@@ -42,5 +42,3 @@ steps:
           -u ${USERNAME}:${GITHUB_TOKEN} \
           $BASE_URL/repos/$REPO_NAME/dispatches
   displayName: 'Github Release'
-  env:
-    GITHUB_TOKEN: $(System.AccessToken)
