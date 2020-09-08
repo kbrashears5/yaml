@@ -1,6 +1,7 @@
 # create parameters
 parameters:
-  scriptPath: ''  # path to shell script
+  scriptPath: ''                              # path to shell script
+  createGithubRelease: 'true'                # whether or not to create a github release
 
 stages:
 - stage: 'Build'
@@ -14,3 +15,7 @@ stages:
     # check for syntax errors
     - bash: bash -n -v '${{ parameters.scriptPath }}'
       displayName: 'Build Shell Script'
+
+    # create github release
+    - ${{ if eq(parameters.createGithubRelease, 'true') }}:
+      - template: templates/create-github-release.yml@templates

@@ -1,13 +1,12 @@
-## NOTE: requires the persistCredentials: true parameter in the checkout step (https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-devops&tabs=schema%2Cparameter-schema#checkout)
-
 # create parameters
 parameters:
   githubApiUrl: 'https://api.github.com'  # Github API base url
 
 steps:  
-# install jq
+# install jq & curl
 - bash: sudo apt-get update && sudo apt-get install jq && sudo apt-get install curl
-  displayName: 'Install bash dependencies'
+  displayName: 'Install Bash Dependencies'
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
 
 # github release
 - bash: |
@@ -44,3 +43,4 @@ steps:
           --silent \
           $BASE_URL/repos/$REPO_NAME/dispatches
   displayName: 'Github Release'
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))

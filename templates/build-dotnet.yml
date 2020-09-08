@@ -11,6 +11,7 @@ parameters:
   filesToPack: '**/*.*proj'                             # files to pack
   packageFolder: '$(Build.ArtifactStagingDirectory)'    # folder in which to place the package
   nuGetCredentials: 'NuGet'                             # name of NuGet service connection
+  createGithubRelease: 'true'                          # whether or not to create a github release
 
 stages:
 - stage: 'Build'
@@ -90,3 +91,7 @@ stages:
           externalFeedCredentials: '${{ parameters.nuGetCredentials }}'
           nuGetFeedType: external
           publishFeedCredentials: '${{ parameters.nuGetCredentials }}'
+
+      # create github release
+      - ${{ if eq(parameters.createGithubRelease, 'true') }}:
+        - template: templates/create-github-release.yml@templates
