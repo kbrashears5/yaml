@@ -12,12 +12,11 @@ steps:
 # github release
 - bash: |
     BASE_URL="${{ parameters.githubApiUrl }}"
-    echo "Base URL: $BASE_URL"
+    echo "Base URL: [$BASE_URL]"
     BUILD_NUMBER="$(Build.BuildNumber)"
-    echo "Build number: $BUILD_NUMBER"
+    echo "Build number: [$BUILD_NUMBER]"
     REPO_NAME="$(Build.Repository.Name)"
-    echo "Repo name: $REPO_NAME"
-    GITHUB_TOKEN="$(System.AccessToken)"
+    echo "Repo name: [$REPO_NAME]"
     
     # determine username
     REPO_INFO=($(echo $REPO_NAME | tr "/" "\n"))
@@ -41,3 +40,5 @@ steps:
           -u ${USERNAME}:${GITHUB_TOKEN} \
           $BASE_URL/repos/$REPO_NAME/dispatches
   displayName: 'Github Release'
+  env:
+    GITHUB_TOKEN: $(System.AccessToken)
