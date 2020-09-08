@@ -2,7 +2,6 @@
 
 # create parameters
 parameters:
-  scriptPath: ''                          # path to shell script
   githubApiUrl: 'https://api.github.com'  # Github API base url
 
 steps:  
@@ -12,7 +11,7 @@ steps:
 
 # github release
 - bash: |
-    jq -n --arg eventType "release" --arg version "$(Build.BuildNumber)" '{event_type:$eventType,client_payload:{version:$version}}''
+    jq -n --arg eventType "release" --arg version "$(Build.BuildNumber)" '{event_type:$eventType,client_payload:{version:$version}}'
     jq -n \
       --arg eventType "release" \
       --arg version "$(Build.BuildNumber)" \
@@ -28,12 +27,3 @@ steps:
           --silent \
           ${{ parameters.githubApiUrl }}/repos/$(Build.Repository.Name)/dispatches
   displayName: 'Github Release'
-
-
-
-
-
-
-
-
-
