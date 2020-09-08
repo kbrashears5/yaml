@@ -11,6 +11,8 @@ steps:
 
 # github release
 - bash: |
+    echo "$GITHUB_TOKEN"
+    
     BASE_URL="${{ parameters.githubApiUrl }}"
     echo "Base URL: [$BASE_URL]"
     BUILD_NUMBER="$(Build.BuildNumber)"
