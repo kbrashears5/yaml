@@ -11,6 +11,8 @@ steps:
 
 # github release
 - bash: |
+    TOKEN="$(GITHUB_TOKEN)"
+    
     BASE_URL="${{ parameters.githubApiUrl }}"
     echo "Base URL: [$BASE_URL]"
     BUILD_NUMBER="$(Build.BuildNumber)"
@@ -38,7 +40,7 @@ steps:
       | curl -d @- \
           -X POST \
           -H "Accept: application/vnd.github.v3+json" \
+          -u ${USERNAME}:${TOKEN} \
           --silent \
-          -u ${USERNAME}:${GITHUB_TOKEN} \
           $BASE_URL/repos/$REPO_NAME/dispatches
   displayName: 'Github Release'
