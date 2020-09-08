@@ -17,6 +17,12 @@ steps:
     echo "Build number: $BUILD_NUMBER"
     REPO_NAME="$(Build.Repository.Name)"
     echo "Repo name: $REPO_NAME"
+    GITHUB_TOKEN="$(System.AccessToken)"
+    
+    # determine username
+    REPO_INFO=($(echo $REPO_NAME | tr "/" "\n"))
+    USERNAME=${REPO_INFO[0]}
+    echo "Username: [$USERNAME]"
 
     jq -n --arg eventType "release" --arg version "$BUILD_NUMBER" '{event_type:$eventType,client_payload:{version:$version}}'
     jq -n \
@@ -32,5 +38,6 @@ steps:
           -X POST \
           -H "Accept: application/vnd.github.v3+json" \
           --silent \
+          -u ${USERNAME}:${GITHUB_TOKEN} \
           $BASE_URL/repos/$REPO_NAME/dispatches
   displayName: 'Github Release'
