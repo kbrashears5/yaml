@@ -93,6 +93,7 @@ stages:
           publishFeedCredentials: '${{ parameters.nuGetCredentials }}'
   
   - job: Release
+    dependsOn: Build
     # defines agent pool and demands (https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-devops&tabs=example#pool)
     pool:
       vmImage: ubuntu-latest
