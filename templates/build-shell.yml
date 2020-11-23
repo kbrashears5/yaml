@@ -16,6 +16,13 @@ stages:
     - bash: bash -n -v '${{ parameters.scriptPath }}'
       displayName: 'Build Shell Script'
 
+  - job: Release
+    dependsOn: Build
+    # defines agent pool and demands (https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-devops&tabs=example#pool)
+    pool:
+      vmImage: ubuntu-latest
+
+    steps:
     # create github release
     - ${{ if eq(parameters.createGithubRelease, 'true') }}:
       - template: create-github-release.yml
