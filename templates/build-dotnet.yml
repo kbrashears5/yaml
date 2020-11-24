@@ -14,7 +14,7 @@ parameters:
   createGithubRelease: 'true'                          # whether or not to create a github release
 
 stages:
-- stage: 'Build'
+- stage: 'Github'
   jobs:
   - job: Build
     # defines agent pool and demands (https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-devops&tabs=example#pool)
